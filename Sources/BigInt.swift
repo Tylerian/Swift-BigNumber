@@ -19,8 +19,15 @@ import Foundation
 
 public final class BigInt
 {
+    // region #Properties
     private var handle:mp_int
+    private var bitCount:Int
+    {
+        return Int(mp_signed_bin_size(&self.handle))
+    }
+    // endregion
     
+    // region #Initializers
     public init()
     {
         self.handle = mp_int()
@@ -65,6 +72,7 @@ public final class BigInt
             fatalError("Fatal error while initializing BigInt(string:radix:).Type: \(message)")
         }
     }
+    // endregion
 }
 
 /**
@@ -73,6 +81,43 @@ public final class BigInt
 extension BigInt
 {
     public static let zero:BigInt = BigInt()
+}
+
+/**
+ * StringConvertible
+ */
+extension BigInt : CustomStringConvertible
+{
+    public var description: String
+    {
+        return self.stringValue()
+    }
+    
+    public func stringValue(radix: Int32 = 10) -> String
+    {
+        guard 2 ... 64 ~= radix else {
+            fatalError("Radix must be a value between 2 and 64 inclusive!")
+        }
+        
+        var mpsize = Int32()
+        var result = mp_radix_size(&self.handle, radix, &mpsize)
+        
+        guard result == MP_OKAY else {
+            let message = String(describing: mp_error_to_string(result))
+            fatalError("Fatal error while running mp_radix_size(value:radix:\(radix):buffer:): \(message)")
+        }
+        
+        var buffer = [Int8](repeating: 0, count: Int(mpsize))
+        
+        result = mp_read_radix(&self.handle, &buffer, radix)
+        
+        guard result == MP_OKAY else {
+            let message = String(describing: mp_error_to_string(result))
+            fatalError("Fatal error while running mp_read_radix(value:buffer:radix:\(radix)): \(message)")
+        }
+        
+        return String(cString: &buffer)
+    }
 }
 
 /**
