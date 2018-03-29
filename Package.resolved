@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CTomMath",
+        "repositoryURL": "https://github.com/Tylerian/CTomMath",
+        "state": {
+          "branch": null,
+          "revision": "c6ade6dbe37a1e9b78d26626ce9eefb039ef49db",
+          "version": "1.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
